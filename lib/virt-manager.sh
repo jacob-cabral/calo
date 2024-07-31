@@ -18,6 +18,7 @@ then
                    qemu-system \
                    virt-manager
   sudo usermod --append --groups kvm,libvirt $USER
+  echo "O Virtual Machine Manager foi instalado com sucesso. Contudo, a sessão do usuário deve ser reiniciada, para que os recursos do Virtual Machine Manager sejam disponibilizados sem a necessidade de acesso privilegiado (sudo)."
 else
   echo "O Virtual Machine Manager já está instalado."
 fi

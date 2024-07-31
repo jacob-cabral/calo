@@ -13,6 +13,7 @@ cat <<- EOF | sudo tee /etc/docker/daemon.json
 }
 EOF
 sudo systemctl restart docker.service
+echo "O Docker foi instalado com sucesso. Contudo, a sessão do usuário deve ser reiniciada, para que os recursos do Docker sejam disponibilizados sem a necessidade de acesso privilegiado (sudo)."
 else
   echo "O Docker já está instalado."
 fi
