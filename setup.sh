@@ -28,9 +28,9 @@ do
 done
 
 # Implantação do Bind9 e configuração do domínio de exemplo.
-estadoServidorNomes=$(lxc list nomes --format json | jq --raw-output .[].status)
+estadoServidorNomes=$(lxc list nomes --format json | jq --raw-output '.[].status')
 ifname=lxdbr0
-gateway=$(ip -json address show $ifname | jq -r .[].addr_info[].local)
+gateway=$(ip -json address show $ifname | jq --raw-output '.[].addr_info[] | select(.family = "inet").local')
 ip=$(echo $gateway | sed --expression='s/^\(.\+\)\(\.[0-9]\{1,3\}\)$/\1.53/g')
 
 if test -z "$estadoServidorNomes"
@@ -56,12 +56,12 @@ else
 fi
 
 # Implantação do cluster Kubernetes.
-clusters=$(k3d cluster list --output=json | jq --raw-output .[])
+clusters=$(k3d cluster list --output=json | jq --raw-output '.[]')
 isClusterCreated=""
 
 if test ! -z "$clusters"
 then
-  clusters=$(echo $clusters | jq --raw-output .name)
+  clusters=$(echo $clusters | jq --raw-output '.name')
   for cluster in ${clusters[@]}
   do
     if test "$subdominio" == "$cluster"
