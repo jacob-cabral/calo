@@ -5,7 +5,7 @@ set -e
 # Instalação do LXD.
 if test -z "$(which lxd)"
 then
-  sudo snap install lxd --stable --yes
+  sudo snap install lxd --stable
 else
   echo "O LXD já está instalado."
 fi
