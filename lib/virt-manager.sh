@@ -17,6 +17,7 @@ then
                    libosinfo-bin \
                    qemu-system \
                    virt-manager
+  sudo usermod --append --groups kvm,libvirt $USER
 else
   echo "O Virtual Machine Manager já está instalado."
 fi
