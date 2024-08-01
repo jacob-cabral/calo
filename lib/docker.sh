@@ -16,7 +16,7 @@ deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] h
 EOF
 # Intalação da versão mais recente do Docker.
 sudo apt update
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --yes
 # Inclusão do usuário atual como membro do grupo do Docker.
 sudo usermod --append --groups docker $USER
 cat <<- EOF | sudo tee /etc/docker/daemon.json
