@@ -6,14 +6,14 @@ cidr=$ip/$prefixlen
 ipReverso=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\).\+$/\3.\2.\1/')
 octeto=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\).\+$/\1/')
 # Provisionar o contêiner.
-lxc init ubuntu:22.04 nomes --config=limits.cpu=1 --config=limits.cpu.allowance=50% --config=limits.memory=256MiB
+sudo lxc init ubuntu:22.04 nomes --config=limits.cpu=1 --config=limits.cpu.allowance=50% --config=limits.memory=256MiB
 # Adicionar a interface de rede ao contêiner.
-lxc config device add nomes eth0 nic nictype=bridged parent=$ifname
+sudo lxc config device add nomes eth0 nic nictype=bridged parent=$ifname
 # Iniciar o contêiner e aguardar por 30 s a ativação dos seus serviços.
-lxc start nomes
+sudo lxc start nomes
 sleep 30
 # Configurar a interface de rede.
-lxc exec nomes -- sudo sh -c "cat << EOF > /etc/netplan/50-cloud-init.yaml
+sudo lxc exec nomes -- sudo sh -c "cat << EOF > /etc/netplan/50-cloud-init.yaml
 # This file is generated from information provided by the datasource.  Changes
 # to it will not persist across an instance reboot.  To disable cloud-init's
 # network configuration capabilities, write a file
@@ -38,16 +38,16 @@ network:
                 search:
                 - $dominio
 EOF"
-lxc exec nomes -- sudo chmod --recursive o-r /etc/netplan
-lxc exec nomes -- sudo netplan apply
+sudo lxc exec nomes -- sudo chmod --recursive o-r /etc/netplan
+sudo lxc exec nomes -- sudo netplan apply
 # Atualizar o sistema operacional.
-lxc exec nomes -- sudo apt update
-lxc exec nomes --env=NEEDRESTART_MODE=a --env=DEBIAN_FRONTEND=noninteractive -- sudo apt upgrade --yes
-lxc exec nomes --env=NEEDRESTART_MODE=a --env=DEBIAN_FRONTEND=noninteractive -- sudo apt autoremove --yes
-lxc exec nomes -- sudo apt autoclean
+sudo lxc exec nomes -- sudo apt update
+sudo lxc exec nomes --env=NEEDRESTART_MODE=a --env=DEBIAN_FRONTEND=noninteractive -- sudo apt upgrade --yes
+sudo lxc exec nomes --env=NEEDRESTART_MODE=a --env=DEBIAN_FRONTEND=noninteractive -- sudo apt autoremove --yes
+sudo lxc exec nomes -- sudo apt autoclean
 # Instalar e configurar o Bind9 (https://wiki.debian.org/Bind9).
-lxc exec nomes -- sudo apt install bind9 --yes
-lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/named.conf.local
+sudo lxc exec nomes -- sudo apt install bind9 --yes
+sudo lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/named.conf.local
 //
 // Do any local configuration here
 //
@@ -66,7 +66,7 @@ zone \"$ipReverso.in-addr.arpa\" {
     file \"/etc/bind/db.$octeto\";
 };
 EOF"
-lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/named.conf.options
+sudo lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/named.conf.options
 options {
   directory \"/var/cache/bind\";
 
@@ -96,7 +96,7 @@ options {
   listen-on { any; };
 };
 EOF"
-lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/db.$dominio
+sudo lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/db.$dominio
 ;
 ; BIND arquivo de dados para o domínio $dominio.
 ;
@@ -113,7 +113,7 @@ nomes                           IN      A       $ip
 $(printf "%-29s" $subdominio)   IN      A       $gateway
 $(printf "*.%-29s" $subdominio) IN      CNAME   $subdominio
 EOF"
-lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/db.$octeto
+sudo lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/db.$octeto
 ;
 ; BIND arquivo de dados reversos para a rede.
 ;
@@ -129,6 +129,6 @@ lxc exec nomes -- sudo sh -c "cat << EOF > /etc/bind/db.$octeto
 10  IN  PTR  nomes.$dominio.
 EOF"
 # Reiniciar o serviço do Bind9 (https://wiki.debian.org/Bind9).
-lxc exec nomes -- sudo systemctl restart bind9.service
+sudo lxc exec nomes -- sudo systemctl restart bind9.service
 unset ifname gateway prefixlen cidr ipReverso octeto
 echo "O Bind9 foi implantado com sucesso."
