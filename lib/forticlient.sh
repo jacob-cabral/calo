@@ -1,7 +1,4 @@
 #! /bin/bash
-# Interrompe a execução em caso de erro.
-set -e
-
 # Instalação do FortiClient.
 if test -z "$(which forticlient)"
 then
