@@ -5,7 +5,7 @@ set -e
 # Instalação do SDKMAN.
 if [[ ! -d "$SDKMAN_DIR" ]] || [[ ! -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]
 then
-  ./sdkman.sh
+  lib/sdkman.sh
 fi
 
 # Instalação do OpenJDK.

@@ -5,7 +5,7 @@ set -e
 # Instalação do NVM.
 if [[ ! -d "$NVM_DIR" ]] || [[ ! -s "$NVM_DIR/nvm.sh" ]]
 then
-  ./nvm.sh
+  lib/nvm.sh
 fi
 
 # Instalação do NodeJS 16.
