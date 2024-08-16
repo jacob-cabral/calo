@@ -2,10 +2,13 @@
 # Interrompe a execução em caso de erro.
 set -e
 
+# Importação da função de definição da necessidade de reiniciar o sistema operacional.
+source util/reboot-needed.sh
+
 # Instalação do Virtual Machine Manager.
 if test -z "$(which virt-manager)"
 then
-  sudo apt install virt-manager --yes
+  # Instalação da versão mais recente do Virtual Machine Manager e das suas dependências.
   sudo apt install --yes \
                    qemu-kvm \
                    libvirt-daemon \
@@ -17,8 +20,11 @@ then
                    libosinfo-bin \
                    qemu-system \
                    virt-manager
+  # Inclusão do usuário atual como membro dos grupos kvm e libvirt.
   sudo usermod --append --groups kvm,libvirt $USER
-  echo "O Virtual Machine Manager foi instalado com sucesso. Contudo, a sessão do usuário deve ser reiniciada, para que os recursos do Virtual Machine Manager sejam disponibilizados sem a necessidade de acesso privilegiado (sudo)."
+  # Definição da necessidade de reiniciar o sistema operacional.
+  setRebootNeeded
+  echo "O Virtual Machine Manager foi instalado com sucesso."
 else
   echo "O Virtual Machine Manager já está instalado."
 fi

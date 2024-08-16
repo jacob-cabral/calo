@@ -2,8 +2,11 @@
 # Interrompe a execução em caso de erro.
 set -e
 
-# Importação da função de validação de valor não nulo.
+# Importação de funções utilitárias.
 source util/is-not-null.sh
+source util/reboot-needed.sh
+
+# Importação das funções de verificação e definição da necessidade de reiniciar o sistema operacional.
 
 # Obtenção do diretório dos certificados SSL.
 diretorioCertificados="$PWD"
@@ -26,6 +29,10 @@ do
   chmod ug+x ${installer}
   ${installer}
 done
+
+# Verificar a necessidade de reiniciar.
+isRebootNeeded
+
 # Iniciar o LXD, se necessário.
 if test ! -z "$(lxc storage list --format=json | jq '.[] | select(.name)')"
 then

@@ -2,12 +2,19 @@
 # Interrompe a execução em caso de erro.
 set -e
 
+# Importação da função de definição da necessidade de reiniciar o sistema operacional.
+source util/reboot-needed.sh
+
 # Instalação do LXD.
 if test -z "$(which lxd)"
 then
+  # Instalação da versão estável do LXD.
   sudo snap install lxd --stable
+  # Inclusão do usuário atual como membro do grupo do LXD.
   sudo usermod --append --groups lxd $USER
-  echo "O LXD foi instalado com sucesso. Contudo, a sessão do usuário deve ser reiniciada, para que os recursos do LXD sejam disponibilizados sem a necessidade de acesso privilegiado (sudo)."
+  # Definição da necessidade de reiniciar o sistema operacional.
+  setRebootNeeded
+  echo "O LXD foi instalado com sucesso."
 else
   echo "O LXD já está instalado."
 fi

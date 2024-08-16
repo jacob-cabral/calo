@@ -2,6 +2,9 @@
 # Interrompe a execução em caso de erro.
 set -e
 
+# Importação da função de definição da necessidade de reiniciar o sistema operacional.
+source util/reboot-needed.sh
+
 # Instalação do Docker.
 if test -z "$(which docker)"
 then
@@ -14,18 +17,21 @@ sudo chmod a+r /etc/apt/keyrings/docker.asc
 cat <<- EOF | sudo tee /etc/apt/sources.list.d/docker.list
 deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable
 EOF
-# Intalação da versão mais recente do Docker.
+# Instalação da versão mais recente do Docker.
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin --yes
 # Inclusão do usuário atual como membro do grupo do Docker.
 sudo usermod --append --groups docker $USER
+# Definição do diretório raiz dos dados do Docker.
 cat <<- EOF | sudo tee /etc/docker/daemon.json
 {
   "data-root": "/var/lib/docker"
 }
 EOF
 sudo systemctl restart docker.service
-echo "O Docker foi instalado com sucesso. Contudo, a sessão do usuário deve ser reiniciada, para que os recursos do Docker sejam disponibilizados sem a necessidade de acesso privilegiado (sudo)."
+# Definição da necessidade de reiniciar o sistema operacional.
+setRebootNeeded
+echo "O Docker foi instalado com sucesso."
 else
-  echo "O Docker já está instalado."
+echo "O Docker já está instalado."
 fi
