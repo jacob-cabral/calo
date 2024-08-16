@@ -31,7 +31,6 @@ EOF
 sudo systemctl restart docker.service
 # Definição da necessidade de reiniciar o sistema operacional.
 setRebootNeeded
-echo "O Docker foi instalado com sucesso."
 else
 echo "O Docker já está instalado."
 fi

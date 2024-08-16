@@ -24,7 +24,6 @@ then
   sudo usermod --append --groups kvm,libvirt $USER
   # Definição da necessidade de reiniciar o sistema operacional.
   setRebootNeeded
-  echo "O Virtual Machine Manager foi instalado com sucesso."
 else
   echo "O Virtual Machine Manager já está instalado."
 fi

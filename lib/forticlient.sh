@@ -16,7 +16,6 @@ then
   sudo apt install --fix-broken --yes
   rm $installer
   unset installer
-  echo "O FortiClient foi instalado com sucesso."
 else
   echo "O FortiClient já está instalado."
 fi
