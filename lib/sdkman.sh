@@ -6,16 +6,16 @@ set -e
 if [[ ! -d "$SDKMAN_DIR" ]] || [[ ! -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]]
 then
 curl -s "https://get.sdkman.io?rcupdate=false" | bash
-cat << EOF | sudo tee /etc/profile.d/sdkman.sh
+if test -z "$(grep 'SDKMAN' $HOME/.bashrc)"
+then
+cat << EOF | tee --append "$HOME/.bashrc"
+
 # SDKMAN! Configuration
 export SDKMAN_DIR="\$HOME/.sdkman"
 [[ -s "\$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "\$SDKMAN_DIR/bin/sdkman-init.sh"
 EOF
-if test -z "$(grep 'sdkman.sh' ~/.bashrc)"
-then
-  printf "\n%s\n%s\n" "# SDKMAN! Configuration" "source /etc/profile.d/sdkman.sh" >> ~/.bashrc
+source "$HOME/.bashrc"
 fi
-source ~/.bashrc
 else
   echo "O SDKMAN já está instalado."
 fi
