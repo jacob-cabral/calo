@@ -6,6 +6,7 @@ set -e
 if [[ ! -d "$NVM_DIR" ]] || [[ ! -s "$NVM_DIR/nvm.sh" ]]
 then
   lib/nvm.sh
+  source ~/.nvm/nvm.sh
 fi
 
 # Instalação do NodeJS 16.
