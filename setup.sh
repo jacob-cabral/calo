@@ -44,7 +44,7 @@ fi
 # Implantação do Bind9 e configuração do domínio de exemplo.
 estadoServidorNomes=$(lxc list nomes --format json | jq --raw-output '.[].status')
 ifname=lxdbr0
-gateway=$(ip -json address show $ifname | jq --raw-output '.[].addr_info[] | select(.family = "inet").local')
+gateway=$(ip -json address show $ifname | jq --raw-output 'limit(1; .[].addr_info[] | select(.family == "inet") | .local)')
 ip=$(echo $gateway | sed --expression='s/^\(.\+\)\(\.[0-9]\{1,3\}\)$/\1.53/g')
 
 if test -z "$estadoServidorNomes"
