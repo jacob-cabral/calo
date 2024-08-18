@@ -34,7 +34,7 @@ done
 isRebootNeeded
 
 # Iniciar o LXD, se necessário.
-if test ! -z "$(lxc storage list --format=json | jq '.[] | select(.name)')"
+if test -z "$(lxc storage list --format=json | jq '.[] | select(.name)')"
 then
   echo "Iniciando o LXD."
   lxd init --minimal
