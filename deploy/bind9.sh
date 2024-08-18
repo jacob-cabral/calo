@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo "Implantação do serviço DNS (Bind9)."
-prefixlen=$(ip -json address show $ifname | jq -r 'limit(1; .[].addr_info[] | select(.family == "inet") | .prefixlen)')
+prefixlen=$(ip -json address show $ifname | jq --raw-output 'limit(1; .[].addr_info[] | select(.family == "inet") | .prefixlen)')
 cidr=$ip/$prefixlen
 ipReverso=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\).\+$/\3.\2.\1/')
 octeto=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\).\+$/\1/')
