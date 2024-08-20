@@ -5,11 +5,11 @@ set -e
 # Importação da função utilitária isNotNull.
 source util/is-not-null.sh
 
-# Definição do domínio raiz, caso não definido previamente.
-if test -z "$dominio"
-then
-  dominio="exemplo"
-fi
+# Validação dos dados obrigatórios.
+isNotNull dominio
+isNotNull subdominio
+isNotNull organizacao
+isNotNull unidadeOrganizacional
 
 # Definição do diretório compartilhado, caso não definido previamente.
 if test -z "$diretotioCompartilhado"
@@ -18,9 +18,6 @@ then
 fi
 
 mkdir --parents "$diretorioCompartilhado"
-
-# Validação do nome da organização.
-isNotNull organizacao
 
 chavePrivadaACRaiz="$diretorioCertificados/ac.$dominio.key"
 certificadoACRaiz="$diretorioCertificados/ac.$dominio.crt"
@@ -38,9 +35,6 @@ then
   sudo update-ca-certificates
   echo "O certificado da $nomeComumOrganizacao foi emitido com sucesso."
 fi
-# Definição do subdomínio e da unidade organizacional, caso não definidos previamente.
-isNotNull subdominio
-isNotNull unidadeOrganizacional
 
 subdominioComHifenSemPonto=$(echo -n $subdominio | sed --expression 's/\./\-/g')
 chavePrivadaSubdominio="$diretorioCertificados/$subdominio.$dominio.key"
@@ -71,11 +65,8 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx --version=4.9.0 --namespace=ingress-nginx --create-namespace --set=controller.ingressClassResource.default=true
 echo "O Nginx Ingress Controller foi implantado com sucesso."
 # Definição do cluster como cliente do serviço DNS.
-if [ -z "$ipServidorNomes" ]
-then
-  echo "O endereço IP do servidor de nomes é obrigatório."
-  exit -1
-fi
+isNotNull ipServidorNomes
+
 echo "Configuração do cluster como cliente do serviço DNS."
 cat << EOF | kubectl apply --namespace=kube-system --filename -
 apiVersion: v1

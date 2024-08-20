@@ -11,10 +11,6 @@ source util/reboot-needed.sh
 # Obtenção do diretório dos certificados SSL.
 diretorioCertificados="$PWD"
 
-# Validação dos nomes de domínio e subdomínio.
-isNotNull dominio
-isNotNull subdominio
-
 # Definição dos diretórios raiz das configurações.
 diretorioRaiz=$(dirname "$(realpath "$0")")
 cd "${diretorioRaiz}"

@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 echo "Implantação do serviço DNS (Bind9)."
+
+# Validação dos dados obrigatórios.
+isNotNull dominio
+isNotNull subdominio
+
 prefixlen=$(ip -json address show $ifname | jq --raw-output 'limit(1; .[].addr_info[] | select(.family == "inet") | .prefixlen)')
 cidr=$ip/$prefixlen
 ipReverso=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\).\+$/\3.\2.\1/')
