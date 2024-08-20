@@ -223,7 +223,7 @@ grafana:
       cert-manager.io/cluster-issuer: emissor-ac-nuvem
     enabled: true
     hosts:
-    - grafana.nuvem.exemplo
+    - grafana.${subdominio}.${dominio}
     path: /
     pathType: Prefix
     tls:
@@ -261,7 +261,7 @@ expose:
       secretName: harbor-tls
   ingress:
     hosts:
-      core: harbor.nuvem.exemplo
+      core: harbor.${subdominio}.${dominio}
     className: nginx
     annotations:
       # note different ingress controllers may require a different ssl-redirect annotation
@@ -271,7 +271,7 @@ expose:
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       cert-manager.io/cluster-issuer: emissor-ac-nuvem
-externalURL: https://harbor.nuvem.exemplo
+externalURL: https://harbor.${subdominio}.${dominio}
 harborAdminPassword: password
 EOF
 helm repo add harbor https://helm.goharbor.io
