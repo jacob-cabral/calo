@@ -1,23 +1,27 @@
 #!/bin/bash
 # Sai imediatamente se um comando sai com um status não-zero.
 set -e
+
+# Importação da função utilitária isNotNull.
+source util/is-not-null.sh
+
 # Definição do domínio raiz, caso não definido previamente.
 if test -z "$dominio"
 then
   dominio="exemplo"
 fi
 
+# Definição do diretório compartilhado, caso não definido previamente.
 if test -z "$diretotioCompartilhado"
 then
   diretorioCompartilhado="$HOME/.local/share/k3d"
 fi
 
-if test ! -d "$diretotioCompartilhado"
-then
-  mkdir "$diretorioCompartilhado"
-fi
+mkdir --parents "$diretorioCompartilhado"
 
-organizacao="${dominio^}"
+# Validação do nome da organização.
+isNotNull organizacao
+
 chavePrivadaACRaiz="$diretorioCertificados/ac.$dominio.key"
 certificadoACRaiz="$diretorioCertificados/ac.$dominio.crt"
 if [ ! -f "$certificadoACRaiz" ]
@@ -34,12 +38,10 @@ then
   sudo update-ca-certificates
   echo "O certificado da $nomeComumOrganizacao foi emitido com sucesso."
 fi
-# Definição do domínio raiz, caso não definido previamente.
-if [ -z "$subdominio" ]
-then
-  echo "O subdomínio é obrigatório."
-  exit -1
-fi
+# Definição do subdomínio e da unidade organizacional, caso não definidos previamente.
+isNotNull subdominio
+isNotNull unidadeOrganizacional
+
 subdominioComHifenSemPonto=$(echo -n $subdominio | sed --expression 's/\./\-/g')
 chavePrivadaSubdominio="$diretorioCertificados/$subdominio.$dominio.key"
 requisicaoAssinaturaCertificadoSubdominio="$diretorioCertificados/$subdominio.$dominio.csr"
@@ -48,10 +50,10 @@ if [ ! -f "$certificadoSubdominio" ]
 then
   if [ -z "$nomeComumUnidadeOrganizacional" ]
   then
-    nomeComumUnidadeOrganizacional="${subdominio^}"
+    nomeComumUnidadeOrganizacional="AC $unidadeOrganizacional"
   fi
   echo "Criação da chave privada e emissão do certificado SSL da unidade organizacional."
-  openssl req -newkey rsa:2048 -nodes -keyout "$chavePrivadaSubdominio" -subj "/C=BR/ST=RJ/L=Rio de Janeiro/O=$organizacao/OU=${subdominio^}/CN=$nomeComumUnidadeOrganizacional" -out "$requisicaoAssinaturaCertificadoSubdominio"
+  openssl req -newkey rsa:2048 -nodes -keyout "$chavePrivadaSubdominio" -subj "/C=BR/ST=RJ/L=Rio de Janeiro/O=$organizacao/OU=$unidadeOrganizacional/CN=$nomeComumUnidadeOrganizacional" -out "$requisicaoAssinaturaCertificadoSubdominio"
   openssl x509 -req -extfile <(printf "subjectKeyIdentifier = hash\nauthorityKeyIdentifier = keyid:always,issuer\nbasicConstraints = critical, CA:true, pathlen:0\nkeyUsage = critical, digitalSignature, cRLSign, keyCertSign\nsubjectAltName=DNS:$subdominio.$dominio,DNS:*.$subdominio.$dominio") -days 365 -CA "$certificadoACRaiz" -CAkey "$chavePrivadaACRaiz" -CAcreateserial -in "$requisicaoAssinaturaCertificadoSubdominio" -out "$certificadoSubdominio"
   echo "A chave privada e o certificado SSL da unidade organizacional, $nomeComumUnidadeOrganizacional, foi emitido com sucesso."
 fi
