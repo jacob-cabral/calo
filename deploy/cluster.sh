@@ -40,6 +40,7 @@ then
   echo "O subdomínio é obrigatório."
   exit -1
 fi
+subdominioComHifenSemPonto=$(echo -n $subdominio | sed --expression 's/\./\-/g')
 chavePrivadaSubdominio="$diretorioCertificados/$subdominio.$dominio.key"
 requisicaoAssinaturaCertificadoSubdominio="$diretorioCertificados/$subdominio.$dominio.csr"
 certificadoSubdominio="$diretorioCertificados/$subdominio.$dominio.crt"
@@ -54,8 +55,8 @@ then
   openssl x509 -req -extfile <(printf "subjectKeyIdentifier = hash\nauthorityKeyIdentifier = keyid:always,issuer\nbasicConstraints = critical, CA:true, pathlen:0\nkeyUsage = critical, digitalSignature, cRLSign, keyCertSign\nsubjectAltName=DNS:$subdominio.$dominio,DNS:*.$subdominio.$dominio") -days 365 -CA "$certificadoACRaiz" -CAkey "$chavePrivadaACRaiz" -CAcreateserial -in "$requisicaoAssinaturaCertificadoSubdominio" -out "$certificadoSubdominio"
   echo "A chave privada e o certificado SSL da unidade organizacional, $nomeComumUnidadeOrganizacional, foi emitido com sucesso."
 fi
-echo "Criação do cluster Kubernetes intitulado $subdominio."
-k3d cluster create $subdominio \
+echo "Criação do cluster Kubernetes intitulado $subdominioComHifenSemPonto."
+k3d cluster create $subdominioComHifenSemPonto \
   --servers=3 \
   --port=80:80@loadbalancer \
   --port=443:443@loadbalancer \
@@ -91,17 +92,17 @@ echo "Configuração bem-sucedida do cliente do serviço DNS."
 echo "Implantação do serviço de emissão de certificados SSL (CertManager)."
 helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager jetstack/cert-manager --namespace=cert-manager --create-namespace --set=crds.enabled=true
-kubectl create secret tls chaves-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g') --namespace=cert-manager --cert="$certificadoSubdominio" --key="$chavePrivadaSubdominio"
+kubectl create secret tls chaves-ac-$subdominioComHifenSemPonto --namespace=cert-manager --cert="$certificadoSubdominio" --key="$chavePrivadaSubdominio"
 cat << EOF | kubectl apply --namespace=cert-manager --filename -
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
+  name: emissor-ac-$subdominioComHifenSemPonto
   namespace: cert-manager
 spec:
   ca:
-    secretName: chaves-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
+    secretName: chaves-ac-$subdominioComHifenSemPonto
 EOF
 echo "O CertManager foi implantado com sucesso."
 # Ajustar a implantação do MailHog.
@@ -190,7 +191,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
+    cert-manager.io/cluster-issuer: emissor-ac-$subdominioComHifenSemPonto
   name: mailhog
 spec:
   ingressClassName: nginx
@@ -220,7 +221,7 @@ grafana:
   enabled: true
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
+      cert-manager.io/cluster-issuer: emissor-ac-$subdominioComHifenSemPonto
     enabled: true
     hosts:
     - grafana.${subdominio}.${dominio}
@@ -270,7 +271,7 @@ expose:
       ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
+      cert-manager.io/cluster-issuer: emissor-ac-$subdominioComHifenSemPonto
 externalURL: https://harbor.${subdominio}.${dominio}
 harborAdminPassword: password
 EOF
