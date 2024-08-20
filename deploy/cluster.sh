@@ -91,17 +91,17 @@ echo "Configuração bem-sucedida do cliente do serviço DNS."
 echo "Implantação do serviço de emissão de certificados SSL (CertManager)."
 helm repo add jetstack https://charts.jetstack.io
 helm install cert-manager jetstack/cert-manager --namespace=cert-manager --create-namespace --set=crds.enabled=true
-kubectl create secret tls chaves-ac-$subdominio --namespace=cert-manager --cert="$certificadoSubdominio" --key="$chavePrivadaSubdominio"
+kubectl create secret tls chaves-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g') --namespace=cert-manager --cert="$certificadoSubdominio" --key="$chavePrivadaSubdominio"
 cat << EOF | kubectl apply --namespace=cert-manager --filename -
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: emissor-ac-$subdominio
+  name: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
   namespace: cert-manager
 spec:
   ca:
-    secretName: chaves-ac-$subdominio
+    secretName: chaves-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
 EOF
 echo "O CertManager foi implantado com sucesso."
 # Ajustar a implantação do MailHog.
@@ -190,7 +190,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: emissor-ac-$subdominio
+    cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
   name: mailhog
 spec:
   ingressClassName: nginx
@@ -220,7 +220,7 @@ grafana:
   enabled: true
   ingress:
     annotations:
-      cert-manager.io/cluster-issuer: emissor-ac-nuvem
+      cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
     enabled: true
     hosts:
     - grafana.${subdominio}.${dominio}
@@ -270,7 +270,7 @@ expose:
       ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
-      cert-manager.io/cluster-issuer: emissor-ac-nuvem
+      cert-manager.io/cluster-issuer: emissor-ac-$(echo -n $subdominio | sed --expression 's/\./\-/g')
 externalURL: https://harbor.${subdominio}.${dominio}
 harborAdminPassword: password
 EOF
