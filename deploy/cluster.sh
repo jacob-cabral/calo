@@ -56,6 +56,7 @@ k3d cluster create $subdominioComHifenSemPonto \
   --servers=3 \
   --port=80:80@loadbalancer \
   --port=443:443@loadbalancer \
+  --image=rancher/k3s:v1.28.14-k3s1 \
   --k3s-arg="--disable=traefik@all:*" \
   --volume="$certificadoACRaiz":/etc/ssl/certs/ac.$dominio.pem \
   --volume="$diretorioCompartilhado":/hostPath
