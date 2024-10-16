@@ -8,8 +8,6 @@ source util/is-not-null.sh
 # Validação dos dados obrigatórios.
 isNotNull dominio
 isNotNull subdominio
-isNotNull organizacao
-isNotNull unidadeOrganizacional
 
 # Definição do diretório compartilhado, caso não definido previamente.
 if test -z "$diretotioCompartilhado"
@@ -23,6 +21,7 @@ chavePrivadaACRaiz="$diretorioCertificados/ac.$dominio.key"
 certificadoACRaiz="$diretorioCertificados/ac.$dominio.crt"
 if [ ! -f "$certificadoACRaiz" ]
 then
+  isNotNull organizacao
   echo "Emissão do certificado SSL da AC Raiz $organizacao."
   if [ -z "$nomeComumOrganizacao" ]
   then
@@ -42,6 +41,9 @@ requisicaoAssinaturaCertificadoSubdominio="$diretorioCertificados/$subdominio.$d
 certificadoSubdominio="$diretorioCertificados/$subdominio.$dominio.crt"
 if [ ! -f "$certificadoSubdominio" ]
 then
+  isNotNull organizacao
+  isNotNull unidadeOrganizacional
+
   if [ -z "$nomeComumUnidadeOrganizacional" ]
   then
     nomeComumUnidadeOrganizacional="AC $unidadeOrganizacional"
