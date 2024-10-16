@@ -2,18 +2,16 @@
 # Interrompe a execução em caso de erro.
 set -e
 
-# Importação de funções utilitárias.
-source util/is-not-null.sh
-source util/reboot-needed.sh
-
-# Importação das funções de verificação e definição da necessidade de reiniciar o sistema operacional.
-
 # Obtenção do diretório dos certificados SSL.
 diretorioCertificados="$PWD"
 
 # Definição dos diretórios raiz das configurações.
 diretorioRaiz=$(dirname "$(realpath "$0")")
 cd "${diretorioRaiz}"
+
+# Importação de funções utilitárias.
+source util/is-not-null.sh
+source util/reboot-needed.sh
 
 # Atualização dos pacotes do sistema operacional.
 sudo apt update && sudo apt upgrade --yes && sudo apt autoremove --yes && sudo apt autoclean
