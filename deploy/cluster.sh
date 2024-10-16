@@ -272,16 +272,19 @@ externalURL: https://harbor.${subdominio}.${dominio}
 harborAdminPassword: password
 EOF
 helm repo add harbor https://helm.goharbor.io
-helm install harbor harbor/harbor --namespace=harbor --version=1.14.0 --create-namespace --values=/tmp/harbor-values.yaml
+helm install harbor harbor/harbor --namespace=harbor --create-namespace --version=1.14.0 --values=/tmp/harbor-values.yaml
 rm /tmp/harbor-values.yaml
 # https://grafana.com/grafana/dashboards/12019-loki-dashboard-quick-search/
 # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
 # https://grafana.com/grafana/dashboards/13639-logs-app/
 echo "Os serviços de monitoramento do cluster foram implantados com sucesso."
+echo "Implantação do serviço controlador de Sealed Secrets."
+helm repo add bitnami-labs https://bitnami-labs.github.io/sealed-secrets/
+helm install sealed-secrets bitnami-labs/sealed-secrets --namespace=security --create-namespace --version 2.15.0
+echo "O serviço controlador de Sealed Secrets foi implantado com sucesso."
 # DISPONIBILIZAR STORAGE CLASS VIA NFS V4 NO LXC. Ref. RNP2021-108032.
 # https://help.ubuntu.com/community/NFSv4Howto#NFSv4_Server
 # https://gitlab.rnp.br/fsen/documentacao/-/blob/main/instalacao-do-nfs-v4.md
-# IMPLANTAR O SEALED SECRETS.
 # CONSIDERAR DOMÍNIOS NIP.IO (https://nip.io/)
 # https://keda.sh/
 # https://kyverno.io/
