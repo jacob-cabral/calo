@@ -60,8 +60,8 @@ k3d cluster create $subdominioComHifenSemPonto \
   --port=443:443@loadbalancer \
   --image=rancher/k3s:v1.28.14-k3s1 \
   --k3s-arg="--disable=traefik@all:*" \
-  --volume="$certificadoACRaiz":/etc/ssl/certs/ac.$dominio.pem \
-  --volume="$diretorioCompartilhado":/hostPath
+  --volume="$certificadoACRaiz:/etc/ssl/certs/ac.$dominio.pem@server:*;agent:*" \
+  --volume="$diretorioCompartilhado:/hostPath@server:*;agent:*"
 echo "O cluster $subdominio foi criado com sucesso."
 echo "Instalação do controlador de entrada HTTP e HTTPS (Nginx Ingress Controller)."
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
