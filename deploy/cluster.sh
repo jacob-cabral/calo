@@ -218,11 +218,8 @@ spec:
 EOF
 echo "O MailHog foi implantado com sucesso."
 echo "Implantação dos serviços de monitoramento do cluster."
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm install prometheus prometheus-community/prometheus --namespace=monitoring --create-namespace
-cat << EOF > /tmp/loki-stack-values.yaml
+cat << EOF > /tmp/loki-stack.yaml
 grafana:
-  enabled: true
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: emissor-ac-$subdominioComHifenSemPonto
@@ -235,10 +232,16 @@ grafana:
     - hosts:
       - grafana.$subdominio.$dominio
       secretName: grafana-tls-secret
+prometheus:
+  enabled: true
 EOF
 helm repo add grafana https://grafana.github.io/helm-charts
-helm install loki-stack grafana/loki-stack --namespace=monitoring --values=/tmp/loki-stack-values.yaml
-rm /tmp/loki-stack-values.yaml
+helm install loki-stack grafana/loki-stack --namespace=monitoring --create-namespace --values=/tmp/loki-stack.yaml
+rm /tmp/loki-stack.yaml
+# TODO: Importar os painéis para o Grafana.
+# https://grafana.com/grafana/dashboards/12019-loki-dashboard-quick-search/
+# https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+# https://grafana.com/grafana/dashboards/13639-logs-app/
 # Implantação do Harbor.
 # https://artifacthub.io/packages/helm/harbor/harbor
 # https://docs.docker.com/engine/security/certificates/
@@ -282,9 +285,7 @@ EOF
 helm repo add harbor https://helm.goharbor.io
 helm install harbor harbor/harbor --namespace=harbor --create-namespace --version=1.14.0 --values=/tmp/harbor-values.yaml
 rm /tmp/harbor-values.yaml
-# https://grafana.com/grafana/dashboards/12019-loki-dashboard-quick-search/
-# https://grafana.com/grafana/dashboards/1860-node-exporter-full/
-# https://grafana.com/grafana/dashboards/13639-logs-app/
+
 echo "Os serviços de monitoramento do cluster foram implantados com sucesso."
 echo "Implantação do serviço controlador de Sealed Secrets."
 helm repo add bitnami-labs https://bitnami-labs.github.io/sealed-secrets/
