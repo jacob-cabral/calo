@@ -64,8 +64,16 @@ k3d cluster create $subdominioComHifenSemPonto \
   --volume="$diretorioCompartilhado:/hostPath@server:*;agent:*"
 echo "O cluster $subdominio foi criado com sucesso."
 echo "Instalação do controlador de entrada HTTP e HTTPS (Nginx Ingress Controller)."
+cat << EOF > /tmp/ingress-nginx.yaml
+controller:
+  config:
+    allow-snippet-annotations: true
+  ingressClassResource:
+    default: true
+EOF
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm install ingress-nginx ingress-nginx/ingress-nginx --version=4.9.0 --namespace=ingress-nginx --create-namespace --set=controller.ingressClassResource.default=true
+helm install ingress-nginx ingress-nginx/ingress-nginx --version=4.9.0 --namespace=ingress-nginx --create-namespace --values=/tmp/ingress-nginx.yaml
+rm /tmp/ingress-nginx.yaml
 echo "O Nginx Ingress Controller foi implantado com sucesso."
 # Definição do cluster como cliente do serviço DNS.
 isNotNull ipServidorNomes
