@@ -289,7 +289,7 @@ rm /tmp/harbor-values.yaml
 echo "Os serviços de monitoramento do cluster foram implantados com sucesso."
 echo "Implantação do serviço controlador de Sealed Secrets."
 helm repo add bitnami-labs https://bitnami-labs.github.io/sealed-secrets/
-helm install sealed-secrets bitnami-labs/sealed-secrets --namespace=security --create-namespace --version 2.15.0
+helm install sealed-secrets-controller bitnami-labs/sealed-secrets --namespace=kube-system --create-namespace --version 2.15.0
 echo "O serviço controlador de Sealed Secrets foi implantado com sucesso."
 # DISPONIBILIZAR STORAGE CLASS VIA NFS V4 NO LXC. Ref. RNP2021-108032.
 # https://help.ubuntu.com/community/NFSv4Howto#NFSv4_Server
