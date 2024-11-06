@@ -220,6 +220,7 @@ echo "O MailHog foi implantado com sucesso."
 echo "Implantação dos serviços de monitoramento do cluster."
 cat << EOF > /tmp/loki-stack.yaml
 grafana:
+  enabled: true
   ingress:
     annotations:
       cert-manager.io/cluster-issuer: emissor-ac-$subdominioComHifenSemPonto
