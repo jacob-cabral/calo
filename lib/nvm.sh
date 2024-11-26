@@ -9,7 +9,7 @@ source util/reboot-needed.sh
 if [[ ! -d "$NVM_DIR" ]] || [[ ! -s "$NVM_DIR/nvm.sh" ]]
 then
   # Instalação da versão mais recente do NVM.
-  curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+  curl --output - https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | sudo bash
   # Definição da necessidade de reiniciar o sistema operacional.
   setRebootNeeded
 else
