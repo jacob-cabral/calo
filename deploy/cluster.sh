@@ -247,6 +247,9 @@ rm /tmp/loki-stack.yaml
 # https://artifacthub.io/packages/helm/harbor/harbor
 # https://docs.docker.com/engine/security/certificates/
 cat << EOF > /tmp/harbor-values.yaml
+database:
+  internal:
+    password: Y2hhbmdlaXQK
 expose:
   # Set how to expose the service. Set the type as "ingress", "clusterIP", "nodePort" or "loadBalancer"
   # and fill the information in the corresponding section
