@@ -1,11 +1,15 @@
 #!/bin/bash
+# Sai imediatamente se um comando sai com um status não-zero.
 set -e
-echo "Implantação do serviço DNS (Bind9)."
+
+# Importação da função utilitária isNotNull.
+source util/is-not-null.sh
 
 # Validação dos dados obrigatórios.
 isNotNull dominio
 isNotNull subdominio
 
+echo "Implantação do serviço DNS (Bind9)."
 prefixlen=$(ip -json address show $ifname | jq --raw-output 'limit(1; .[].addr_info[] | select(.family == "inet") | .prefixlen)')
 cidr=$ip/$prefixlen
 ipReverso=$(echo $ip | sed --expression='s/^\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\)\.\([0-9]\{1,3\}\).\+$/\3.\2.\1/')
