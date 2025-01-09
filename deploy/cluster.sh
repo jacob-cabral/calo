@@ -58,7 +58,7 @@ k3d cluster create $subdominioComHifenSemPonto \
   --servers=3 \
   --port=80:80@loadbalancer \
   --port=443:443@loadbalancer \
-  --image=rancher/k3s:v1.28.14-k3s1 \
+  --image=rancher/k3s:v1.29.12-k3s1 \
   --k3s-arg="--disable=traefik@all:*" \
   --volume="$certificadoACRaiz:/etc/ssl/certs/ac.$dominio.pem@server:*;agent:*" \
   --volume="$diretorioCompartilhado:/hostPath@server:*;agent:*"
@@ -241,7 +241,10 @@ helm install loki-stack grafana/loki-stack --namespace=monitoring --create-names
 rm /tmp/loki-stack.yaml
 # TODO: Importar os painéis para o Grafana.
 # https://grafana.com/grafana/dashboards/12019-loki-dashboard-quick-search/
-# https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+# https://grafana.com/grafana/dashboards/11594-detailed-pods-resources/
+# FIXME: remover parâmetros adicionais da consulta das métricas do CPU:
+# ,container_name!=\"POD\",container_name!=\"\",container!=\"monitoring-daemon\"
+# https://grafana.com/grafana/dashboards/1860
 # https://grafana.com/grafana/dashboards/13639-logs-app/
 # Implantação do Harbor.
 # https://artifacthub.io/packages/helm/harbor/harbor
@@ -305,3 +308,5 @@ echo "O serviço controlador de Sealed Secrets foi implantado com sucesso."
 # https://trivy.dev/
 # https://medium.com/@petr.ruzicka/trivy-operator-dashboard-in-grafana-3d9cc733e6ab
 # https://sentry.io/welcome/
+# Instalar o Min.IO
+# https://github.com/minio/minio/tree/master/helm/minio
